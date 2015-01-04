@@ -101,3 +101,38 @@ unittest {
 	assert(fibLinear2(65) == 17167680177565);
 	assert(fibLinear2(70) == 190392490709135);
 }
+
+// A fourth implementation. This one runs in logarithmic time and
+// exponentiates a matrix to calculate the result
+ulong fibLogarithmic(uint n) {
+	import matrix;
+
+	if (n <= 1) return n;
+	
+	auto mat = new Matrix!ulong([[0, 1], [1, 1]]);
+	mat.exponentiate(n);
+	mat = mat.multiply([[0], [1]]);
+
+	return mat[0, 0];
+}
+
+unittest {
+	assert(fibLogarithmic(0) == 0);
+	assert(fibLogarithmic(1) == 1);
+	assert(fibLogarithmic(2) == 1);
+	assert(fibLogarithmic(3) == 2);
+	assert(fibLogarithmic(4) == 3);
+	assert(fibLogarithmic(5) == 5);
+	assert(fibLogarithmic(6) == 8);
+	assert(fibLogarithmic(7) == 13);
+	assert(fibLogarithmic(8) == 21);
+	assert(fibLogarithmic(25) == 75025);
+	assert(fibLogarithmic(30) == 832040);
+	assert(fibLogarithmic(35) == 9227465);
+	assert(fibLogarithmic(40) == 102334155);
+	assert(fibLogarithmic(50) == 12586269025);
+	assert(fibLogarithmic(54) == 86267571272);
+	assert(fibLogarithmic(58) == 591286729879);
+	assert(fibLogarithmic(65) == 17167680177565);
+	assert(fibLogarithmic(70) == 190392490709135);
+}
