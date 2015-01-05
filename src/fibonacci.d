@@ -168,3 +168,32 @@ unittest {
 	assert(fibClosed(65) == 17167680177565);
 	assert(fibClosed(70) == 190392490709135);
 }
+
+ulong fibTable(uint n) {
+	const static int fibs[] = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89,
+		  144, 233, 377, 610, 987, 1697, 2584, 4181];
+
+	if (n < fibs.length) return fibs[n];
+	return fibLinear2(n);
+}
+
+unittest {
+	assert(fibTable(0) == 0);
+	assert(fibTable(1) == 1);
+	assert(fibTable(2) == 1);
+	assert(fibTable(3) == 2);
+	assert(fibTable(4) == 3);
+	assert(fibTable(5) == 5);
+	assert(fibTable(6) == 8);
+	assert(fibTable(7) == 13);
+	assert(fibTable(8) == 21);
+	assert(fibTable(25) == 75025);
+	assert(fibTable(30) == 832040);
+	assert(fibTable(35) == 9227465);
+	assert(fibTable(40) == 102334155);
+	assert(fibTable(50) == 12586269025);
+	assert(fibTable(54) == 86267571272);
+	assert(fibTable(58) == 591286729879);
+	assert(fibTable(65) == 17167680177565);
+	assert(fibTable(70) == 190392490709135);
+}
