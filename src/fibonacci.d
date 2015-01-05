@@ -1,5 +1,7 @@
 module fibonacci;
 
+import std.exception;
+
 // The first implementation: simple, but inefficient as it runs in
 // exponential time and uses exponential memory.
 // This implementation follows the formal definition an can thus be seen
@@ -135,4 +137,34 @@ unittest {
 	assert(fibLogarithmic(58) == 591286729879);
 	assert(fibLogarithmic(65) == 17167680177565);
 	assert(fibLogarithmic(70) == 190392490709135);
+}
+
+ulong fibClosed(uint n) {
+	import std.math : lround, sqrt;
+
+	enforce(n <= 70, "Using fibClosed to calculate values larger than"
+			~ " 70 leads to incorrect results.");
+
+	return lround((1.0 / sqrt(5.0)) * (((1.0 + sqrt(5.0)) / 2) ^^ n));
+}
+
+unittest {
+	assert(fibClosed(0) == 0);
+	assert(fibClosed(1) == 1);
+	assert(fibClosed(2) == 1);
+	assert(fibClosed(3) == 2);
+	assert(fibClosed(4) == 3);
+	assert(fibClosed(5) == 5);
+	assert(fibClosed(6) == 8);
+	assert(fibClosed(7) == 13);
+	assert(fibClosed(8) == 21);
+	assert(fibClosed(25) == 75025);
+	assert(fibClosed(30) == 832040);
+	assert(fibClosed(35) == 9227465);
+	assert(fibClosed(40) == 102334155);
+	assert(fibClosed(50) == 12586269025);
+	assert(fibClosed(54) == 86267571272);
+	assert(fibClosed(58) == 591286729879);
+	assert(fibClosed(65) == 17167680177565);
+	assert(fibClosed(70) == 190392490709135);
 }
