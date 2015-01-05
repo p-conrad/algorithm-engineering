@@ -1,12 +1,19 @@
 module fibonacci;
 
 import std.exception;
+import std.string : format;
+
+// fibonacci numbers larger than this cause the result to overflow
+const static uint maxCorrect = 93;
 
 // The first implementation: simple, but inefficient as it runs in
 // exponential time and uses exponential memory.
 // This implementation follows the formal definition an can thus be seen
 // as correct.
 ulong fibExponential(uint n) {
+	enforce(n <= maxCorrect, format("Values larger than %s cannot be"
+		~ " computed.", maxCorrect));
+
 	if (n <= 1) return n;
 	else return fibExponential(n - 1) + fibExponential(n - 2);
 }
@@ -32,6 +39,9 @@ unittest {
 // A second implementation. This one runs in linear time and has linear
 // memory usage.
 ulong fibLinear(uint n) {
+	enforce(n <= maxCorrect, format("Values larger than %s cannot be"
+		~ " computed.", maxCorrect));
+
 	if (n <= 1) return n;
 
 	auto fib = new ulong[](n + 1);
@@ -69,6 +79,9 @@ unittest {
 // predecessor we can have the algorithm run in linear time and use
 // constant memory.
 ulong fibLinear2(uint n) {
+	enforce(n <= maxCorrect, format("Values larger than %s cannot be"
+		~ " computed.", maxCorrect));
+
 	if (n <= 1) return n;
 
 	ulong first = 0;
@@ -108,6 +121,9 @@ unittest {
 // exponentiates a matrix to calculate the result
 ulong fibLogarithmic(uint n) {
 	import matrix;
+
+	enforce(n <= maxCorrect, format("Values larger than %s cannot be"
+		~ " computed.", maxCorrect));
 
 	if (n <= 1) return n;
 	
