@@ -164,6 +164,36 @@ unittest {
 	}
 }
 
+// The Heapsort algorithm
+void heapSort(T)(T[] array) {
+	import heap;
+
+	if (array.length <= 1) return;
+
+	buildMaxHeap(array);
+	assert(isHeap(array));
+
+	for (auto i = array.length - 1; i >= 1; i--) {
+		swap(array[i], array[0]);
+		maxHeapify(array[0 .. i], 0);
+	}
+	assert(isSorted(array));
+}
+
+unittest {
+	int[] array;
+	for (int i = 1; i <= 10; i++) {
+		array = randomArray!int(2, 300);
+		heapSort(array);
+		assert (isSorted(array));
+	}
+	for (int i = 1; i <= 10; i++) {
+		array = randomArray!int();
+		heapSort(array);
+		assert (isSorted(array));
+	}
+}
+
 version(unittest)
 T[] randomArray(T)(size_t size = 1000, T maxNumber = 30000) {
 	import std.random;
