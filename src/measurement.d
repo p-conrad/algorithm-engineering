@@ -285,3 +285,130 @@ class FibMeasurement : Measurement {
 			return meter.getResult();
 		}
 }
+
+class SortMeasurement : Measurement {
+	import sort;
+	import std.conv;
+	import std.algorithm;
+	import std.random;
+
+	public:
+		enum Arrangement { ASC, DESC, RAND, REP }
+		this (Meter m) { 
+			super(m);
+			toSort = new int[](VECTOR_SIZE);
+			setAscending();
+
+			// some custom configuration
+			super.MEASURE_UPTO = VECTOR_SIZE;
+			super.ITERATE_UPTO = 5;
+		}
+
+		override double singleMeasurement(int n, size_t opIndex) {
+			// generate a subset of toSort holding n elements
+			auto array = toSort[0 .. n].dup;
+
+			if (opIndex == 0) {
+				meter.startMeasurement();
+				insertionSort(array);
+				meter.stopMeasurement();
+			}
+			else if (opIndex == 1) {
+				meter.startMeasurement();
+				quickSort(array);
+				meter.stopMeasurement();
+			}
+			else if (opIndex == 2) {
+				meter.startMeasurement();
+				mergeSort(array);
+				meter.stopMeasurement();
+			}
+			else if (opIndex == 3) {
+				meter.startMeasurement();
+				heapSort(array);
+				meter.stopMeasurement();
+			}
+			else if (opIndex == 4) {
+				meter.startMeasurement();
+				array.sort;
+				meter.stopMeasurement();
+			}
+			else return -1;
+			return meter.getResult();
+		}
+
+		// cycle through all arrangement types and take measurements
+		void measureForAll() {
+			setAscending();
+			doMeasurement();
+			setDescending();
+			doMeasurement();
+			setRandom();
+			doMeasurement();
+			setRepeated();
+			doMeasurement();
+		}
+
+		// functions for changing the arrangement of the input vector
+		void setAscending() {
+			foreach (i, ref e; toSort)
+				e = cast(int) i;
+			a = Arrangement.ASC;
+			setNames();
+		}
+
+		void setDescending() {
+			foreach (i, ref e; toSort)
+				e = cast(int) i;
+			toSort.reverse;
+			a = Arrangement.DESC;
+			setNames();
+		}
+
+		void setRandom() {
+			foreach (ref e; toSort)
+				e = uniform(0, MAX_RAND);
+			a = Arrangement.RAND;
+			setNames();
+		}
+
+		void setRepeated() {
+			int count = VECTOR_SIZE;
+			
+			foreach (i, ref e; toSort) {
+				int random;
+				if (i % REP_COUNT == 0)
+					random = uniform(0, MAX_RAND);
+				e = random;
+			}
+			a = Arrangement.REP;
+			setNames();
+		}
+
+	private:
+		Arrangement a;
+		int[] toSort;
+		char[][] baseNames = to!(char[][])(["insertionSort", "quickSort",
+				"mergeSort", "heapSort", "phobosSort"]);
+		
+		void setNames() {
+			outputs.length = 0;
+			foreach (e; baseNames) {
+				if (a == Arrangement.ASC)
+					outputs ~= (e ~ "_asc");
+				else if (a == Arrangement.DESC) 
+					outputs ~= (e ~ "_desc");
+				else if (a == Arrangement.RAND)
+					outputs ~= (e ~ "_rand");
+				else if (a == Arrangement.REP)
+					outputs ~= (e ~ "_rep");
+				else
+					outputs ~= (e ~ "_undef");
+			}
+		}
+
+		// some configuration
+		int VECTOR_SIZE = 1000;
+		int REP_COUNT = 20;
+		int MAX_RAND = 30000;
+}
