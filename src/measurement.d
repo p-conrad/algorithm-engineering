@@ -373,8 +373,6 @@ class SortMeasurement : Measurement {
 		}
 
 		void setRepeated() {
-			int count = VECTOR_SIZE;
-			
 			foreach (i, ref e; toSort) {
 				int random;
 				if (i % REP_COUNT == 0)
