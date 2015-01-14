@@ -2,6 +2,7 @@ import std.stdio;
 import fibonacci;
 import meter;
 import measurement;
+import cache;
 
 void timeMeasurements(int option) {
 	if (option == 0) {
@@ -32,7 +33,8 @@ int getUserInput() {
 	writeln("(2) Do a cycle count measurement of the fibonacci algorithms");
 	writeln("(3) Do a wall time measurement of the sorting algorithms");
 	writeln("(4) Do a cycle count measurement of the sorting algorithms");
-	writeln("(5) Quit and do nothing");
+	writeln("(5) Print information about this system's caches (Intel only)");
+	writeln("(6) Quit and do nothing");
 	write("Selection: ");
 	readf("%s", &option);
 
@@ -56,6 +58,9 @@ void main() {
 			countCycles(1);
 			break;
 		case 5:
+			printSystemCaches();
+			break;
+		case 6:
 		default:
 			{ }
 	}
