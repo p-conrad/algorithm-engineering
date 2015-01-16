@@ -55,8 +55,10 @@ class Measurement {
 			int iterations;
 
 			for (size_t opIndex = 0; opIndex < outputs.length; opIndex++) {
-				File file;
-				openFile(file, getFilename(outputs[opIndex]));
+				import file;
+				auto outfile = openFile(getFilename(outputs[opIndex]), OUTPUT_FOLDER,
+						FILE_OVERWRITE);
+				writeFileHeader(outfile);
 
 				for (int n = 0; n <= MEASURE_UPTO; n += (n / 10 + 1)) {
 					if (ITERATE && meter.isWall() && n <= ITERATE_UPTO)
@@ -87,9 +89,9 @@ class Measurement {
 						data ~= result;
 					}
 
-					writeResults(file, n);
+					writeResults(outfile, n);
 				}
-				file.close();
+				outfile.close();
 			}
 		}
 
@@ -102,51 +104,6 @@ class Measurement {
 		double roundToPrecision(double value) {
 			int factor = 10 ^^ PRECISION;
 			return (round(value * factor) / factor);
-		}
-
-		// Prepare the output file. This will also implicitly write the
-		// header into it.
-		void openFile(ref File file, in char[] filename) {
-			import std.file;
-			import std.conv;
-			import std.string;
-
-			if (exists(OUTPUT_FOLDER) && !isDir(OUTPUT_FOLDER))
-				remove(OUTPUT_FOLDER);
-			if (!exists(OUTPUT_FOLDER))
-				mkdir(OUTPUT_FOLDER);
-
-			char[] filePath = format("%s/%s", OUTPUT_FOLDER, filename).dup;
-
-			if (exists(filePath) && !FILE_OVERWRITE) {
-				int count = 1;
-				char[][] existingFiles;
-
-				char[] fileToRename = filePath.dup;
-				char[] nextFile;
-				existingFiles ~= fileToRename;
-
-				// put all existing file paths into the array
-				// The last inserted element will be a non-existing file which will
-				// be used as the first 'target' below.
-				do {
-					nextFile = format("%s/%s_%s", OUTPUT_FOLDER, to!(char[])(count), filename).dup;
-					existingFiles ~= nextFile;
-					count++;
-				} while (exists(nextFile));
-
-				char[] target = existingFiles[$ - 1];
-				existingFiles.length -= 1;
-				do {
-					char[] source = existingFiles[$ - 1];
-					existingFiles.length -= 1;
-					rename(source, target);
-					target = source;
-				} while (existingFiles.length > 0);
-			}
-
-			file.open(filePath.idup, "w");
-			writeFileHeader(file);		
 		}
 
 		// get a filename consistent with the type of meter used, having an
