@@ -5,7 +5,9 @@ module cache;
  */
 
 struct CacheProperties {
-	string typeString;
+	string typeString() const @property {
+		return [ "null", "data", "instruction", "unified" ][type];
+	}
 	uint type;
 	uint level;
 	uint self_init;
@@ -14,7 +16,9 @@ struct CacheProperties {
 	uint line_part;
 	uint line_size;
 	uint sets;
-	uint size;
+	uint size() const @property {
+		return associativity * line_part * line_size * sets;
+	}
 }
 
 CacheProperties extractCacheProperties(uint n) {
@@ -38,9 +42,7 @@ CacheProperties extractCacheProperties(uint n) {
 	 * EBX[11:0]: line size
 	 * ECX[31:0] number of sets
 	 */
-	string[] cacheTypes = [ "null", "data", "instruction", "unified" ];
 	cp.type = eax & 0b11111;
-	cp.typeString = cacheTypes[cp.type];
 	cp.level = (eax & 0b111 << 5) >> 5;
 	cp.self_init = (eax & 0b1 << 8) >> 8;
 	cp.full_assoc = (eax & 0b1 << 9) >> 9;
@@ -48,7 +50,6 @@ CacheProperties extractCacheProperties(uint n) {
 	cp.line_part = ((ebx & 0b111111111111 << 12) >> 12) + 1;
 	cp.line_size = (ebx & 0b111111111111) + 1;
 	cp.sets = ecx + 1;
-	cp.size = cp.associativity * cp.line_part * cp.line_size * cp.sets;
 
 	return cp;
 }
