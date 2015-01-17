@@ -1,7 +1,7 @@
 SRCDIR := ./src
 
 DC := dmd
-DFLAGS := -debug -unittest -inline -wi -I$(SRCDIR)
+DFLAGS := -debug -g -unittest -inline -wi -I$(SRCDIR)
 LD := dmd
 
 SOURCES := $(wildcard $(SRCDIR)/*.d)
