@@ -34,7 +34,8 @@ int getUserInput() {
 	writeln("(3) Do a wall time measurement of the sorting algorithms");
 	writeln("(4) Do a cycle count measurement of the sorting algorithms");
 	writeln("(5) Print information about this system's caches (Intel only)");
-	writeln("(6) Quit and do nothing");
+	writeln("(6) Output the memory mountain of this system");
+	writeln("(7) Quit and do nothing");
 	write("Selection: ");
 	readf("%s", &option);
 
@@ -61,6 +62,9 @@ void main() {
 			printSystemCaches();
 			break;
 		case 6:
+			memoryMountain();
+			break;
+		case 7:
 		default:
 			{ }
 	}
