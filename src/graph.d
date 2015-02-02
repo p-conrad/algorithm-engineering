@@ -28,9 +28,9 @@ bool insertVertex(ref Graph g, vert n) {
 	}
 }
 
-// insert a new edge into a graph
+// insert a new edge into a graph. Existing edges will be overridden.
 bool insertEdge(ref Graph g, vert a, vert b, int weight = 1,
-		bool insertNew = true) {
+		bool oneWay = false, bool insertNew = true) {
 	if ((!(a in g) || !(b in g)) && !insertNew)
 		return false;
 	if (adjacent(g, a, b)) return false;
@@ -41,16 +41,18 @@ bool insertEdge(ref Graph g, vert a, vert b, int weight = 1,
 	insertVertex(g, b);
 
 	g[a][b] = weight;
-	g[b][a] = weight;
+	if (!oneWay)
+		g[b][a] = weight;
 
 	return true;
 }
 
 // remove an edge from the graph
-bool removeEdge(ref Graph g, vert a, vert b) {
+bool removeEdge(ref Graph g, vert a, vert b, bool oneWay = false) {
 	if ((a in g) && (b in g)) {
 		g[a].remove(b);
-		g[b].remove(a);
+		if (!oneWay)
+			g[b].remove(a);
 		return true;
 	}
 	return false;
@@ -87,14 +89,50 @@ Edge[] toArray(in Graph g) {
 	return result;
 }
 
+// Since we are working with undirected graphs, an edge (a, b) is stored
+// in its adjacency list if and only if (b, a) is also contained.
+// Although correct, this information is redundant, so generate a graph
+// where each edge is only represented once.
+Graph reduce(in Graph g) {
+	Graph result;
+
+	auto array = toArray(g);
+	foreach(a; array)
+		insertEdge(result, a.expand, true);
+
+	return result;
+}
+
 unittest {
 	Graph g;
+
+	// inserting vertices
 	assert (insertVertex(g, 1));
 	assert (!insertVertex(g, 1));
-	
-	insertVertex(g, 5);
-	assert (insertEdge(g, 1, 5, 3));
-	assert (adjacent(g, 1, 5));
-	assert (adjacent(g, 5, 1));
-	assert (!insertEdge(g, 1, 5));
+	assert (1 in g);
+	insertVertex(g, 2);
+	insertVertex(g, 3);
+
+	// inserting edges, checking weights etc.
+	assert (insertEdge(g, 1, 2, 5));
+	assert (!insertEdge(g, 1, 2));
+	assert (adjacent(g, 1, 2));
+	assert (adjacent(g, 2, 1));
+	assert (g[1][2] == 5);
+	assert (g[2][1] == 5);
+	insertEdge(g, 2, 3, 3);
+	insertEdge(g, 3, 1, 6);
+
+	// inserting and removing edges one-directional
+	assert (removeEdge(g, 1, 2, true));
+	assert (!adjacent(g, 1, 2));
+	assert (adjacent(g, 2, 1));
+	assert (insertEdge(g, 1, 2, 10, true));
+	assert (g[1][2] == 10);
+	assert (g[2][1] == 5);
+
+	// reducing the graph
+	g = reduce(g);
+	assert (adjacent(g, 1, 2));
+	assert (!adjacent(g, 2, 1));
 }
