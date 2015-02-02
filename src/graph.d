@@ -8,8 +8,8 @@ alias vert = int;
 // equals the identifier of a vertex in a graph, containing another
 // associatve array of adjacent nodes. The value then equals the weight
 // of the edge.
-// A simple array would not be sufficient, because it would, for instance,
-// not allow us to generate subsets of a given graph.
+// A simple array would not be sufficient here, because it would, for
+// instance, not allow us to generate subsets of a given graph.
 alias Graph = int[vert][vert];
 
 // check whether two given vertices are connected
@@ -30,7 +30,7 @@ bool insertVertex(ref Graph g, vert n) {
 
 // insert a new edge into a graph
 bool insertEdge(ref Graph g, vert a, vert b, int weight = 1,
-		bool insertNew = false) {
+		bool insertNew = true) {
 	if ((!(a in g) || !(b in g)) && !insertNew)
 		return false;
 	if (adjacent(g, a, b)) return false;
@@ -44,6 +44,47 @@ bool insertEdge(ref Graph g, vert a, vert b, int weight = 1,
 	g[b][a] = weight;
 
 	return true;
+}
+
+// remove an edge from the graph
+bool removeEdge(ref Graph g, vert a, vert b) {
+	if ((a in g) && (b in g)) {
+		g[a].remove(b);
+		g[b].remove(a);
+		return true;
+	}
+	return false;
+}
+
+// deep-copy a graph and all of its elements
+Graph clone(Graph g) {
+	Graph clone;
+	foreach (e; g.byKey())
+		clone[e] = g[e].dup;
+	return clone;
+}
+
+// A tuple representing an edge of the graph. This enables us to store
+// edges of the graph outside an adjacency list, e.g. in a prioriy
+// queue.
+import std.typecons;
+alias Edge = Tuple!(vert, "a", vert, "b", int, "weight");
+
+// generate an array of the edges from a given graph, ignoring
+// any duplicates
+Edge[] toArray(in Graph g) {
+	Graph finished;
+	Edge[] result;
+
+	foreach (a; g.byKey()) {
+		foreach (b; g[a].byKey()) {
+			if (!adjacent(finished, a, b)) {
+				result ~= Edge(a, b, g[a][b]);
+				insertEdge(finished, a, b);
+			}
+		}
+	}
+	return result;
 }
 
 unittest {
