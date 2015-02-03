@@ -169,6 +169,7 @@ Graph genericMST(Graph g) {
 	auto edge = safeEdge(g, tree);
 	while (edge != Edge.init) {
 		insertEdge(tree, edge.expand);
+		edge = safeEdge(g, tree);
 	}
 
 	return tree;
