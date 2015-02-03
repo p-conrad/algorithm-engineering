@@ -159,6 +159,21 @@ Edge safeEdge(in Graph g, in Graph sub) {
 	else return Edge.init;
 }
 
+// a simple algorithm used to generate a minimum spanning tree by
+// repeatedly inserting safe edges. This will only work if the
+// components are connected
+Graph genericMST(Graph g) {
+	if (g.length == 0) return g;
+	Graph tree = construct([g.keys[0]]);
+	
+	auto edge = safeEdge(g, tree);
+	while (edge != Edge.init) {
+		insertEdge(tree, edge.expand);
+	}
+
+	return tree;
+}
+
 unittest {
 	Graph g;
 
