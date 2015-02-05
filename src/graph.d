@@ -168,10 +168,9 @@ Graph!(V, E) genericMST(V = vType, E = eType)(Graph!(V, E) g) {
 	if (g.length == 0) return g;
 	auto tree = construct!(V, E)([g.keys[0]]);
 	
-	auto edge = safeEdge!(V, E)(g, tree);
-	while (edge != Edge!(V, E).init) {
+	for (auto edge = safeEdge!(V, E)(g, tree); edge != Edge!(V, E).init;
+			edge = safeEdge!(V, E)(g, tree)) {
 		insertEdge!(V, E)(tree, edge.expand);
-		edge = safeEdge!(V, E)(g, tree);
 	}
 
 	return tree;
