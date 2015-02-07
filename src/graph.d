@@ -168,7 +168,7 @@ Graph!(V, E) genericMST(V = vType, E = eType)(Graph!(V, E) g) {
 
 	Graph!(V, E) tree;
 	foreach (e; g.byKey()) {
-		insertVertex(tree, e);
+		insertVertex!(V, E)(tree, e);
 
 		for (auto edge = safeEdge!(V, E)(g, tree); edge != Edge!(V, E).init;
 				edge = safeEdge!(V, E)(g, tree)) {
