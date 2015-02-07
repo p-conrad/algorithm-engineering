@@ -248,6 +248,19 @@ void dfsVisit(V = vType, E = eType)(in Graph!(V, E) g,
 	result.vertices[u].f = time;
 }
 
+// an algorithm making use of the DFS algorithm to determine whether an
+// undirected graph is a tree
+bool isTree(V = vType, E = eType)(in Graph!(V, E) g) {
+	auto edges = depthFirstSearch!(V, E)(g).graph;
+	foreach (u; edges.byKey()) {
+		foreach (v; edges[u].byKey()) {
+			if (edges[u][v] == EdgeType.BACKWARD)
+				return false;
+		}
+	}
+	return true;
+}
+
 unittest {
 	Graph!() g;
 
@@ -310,4 +323,34 @@ unittest {
 	assert (res.graph[1][2] == EdgeType.TREE);
 	assert (res.graph[2][3] == EdgeType.TREE);
 	assert (res.graph[3][1] == EdgeType.BACKWARD);
+
+	// determining whether a graph is a tree
+	assert (!isTree!()(g));
+	assert (isTree!()(tree));
+
+	// a more complex example for finding a minimum spanning tree,
+	// consisting of two components, using a different data type
+	auto g2 = construct!char([], [
+			Edge!char('a', 'b', 4),
+			Edge!char('b', 'c', 8),
+			Edge!char('c', 'd', 7),
+			Edge!char('d', 'e', 9),
+			Edge!char('e', 'f', 10),
+			Edge!char('f', 'g', 2),
+			Edge!char('g', 'h', 1),
+			Edge!char('h', 'a', 8),
+			Edge!char('h', 'b', 11),
+			Edge!char('h', 'i', 7),
+			Edge!char('i', 'c', 2),
+			Edge!char('i', 'g', 6),
+			Edge!char('c', 'f', 4),
+			Edge!char('f', 'd', 14),
+			Edge!char('v', 'w', 3),
+			Edge!char('w', 'x', 6),
+			Edge!char('x', 'y', 9),
+			Edge!char('y', 'v', 5),
+			Edge!char('w', 'y', 2)]);
+	assert (!isTree!char(g2));
+	auto g2Tree = genericMST!char(g2);
+	assert (isTree!char(g2Tree));
 }
