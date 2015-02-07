@@ -252,62 +252,62 @@ unittest {
 	Graph!() g;
 
 	// inserting vertices
-	assert(insertVertex!()(g, 1));
-	assert(!insertVertex!()(g, 1));
-	assert(1 in g);
+	assert (insertVertex!()(g, 1));
+	assert (!insertVertex!()(g, 1));
+	assert (1 in g);
 	insertVertex!()(g, 2);
 	insertVertex!()(g, 3);
 
 	// inserting edges, checking weights etc.
-	assert(insertEdge!()(g, 1, 2, 5));
-	assert(!insertEdge!()(g, 1, 2));
-	assert(adjacent!()(g, 1, 2));
-	assert(adjacent!()(g, 2, 1));
-	assert(g[1][2] == 5);
-	assert(g[2][1] == 5);
+	assert (insertEdge!()(g, 1, 2, 5));
+	assert (!insertEdge!()(g, 1, 2));
+	assert (adjacent!()(g, 1, 2));
+	assert (adjacent!()(g, 2, 1));
+	assert (g[1][2] == 5);
+	assert (g[2][1] == 5);
 	insertEdge!()(g, 2, 3, 3);
 	insertEdge!()(g, 3, 1, 6);
 
 	// inserting and removing edges one-directional
-	assert(removeEdge!()(g, 1, 2, true));
-	assert(!adjacent!()(g, 1, 2));
-	assert(adjacent!()(g, 2, 1));
-	assert(insertEdge!()(g, 1, 2, 10, true));
-	assert(g[1][2] == 10);
-	assert(g[2][1] == 5);
+	assert (removeEdge!()(g, 1, 2, true));
+	assert (!adjacent!()(g, 1, 2));
+	assert (adjacent!()(g, 2, 1));
+	assert (insertEdge!()(g, 1, 2, 10, true));
+	assert (g[1][2] == 10);
+	assert (g[2][1] == 5);
 
 	// reducing the graph
 	g = reduce!()(g);
-	assert(adjacent!()(g, 1, 2));
-	assert(!adjacent!()(g, 2, 1));
+	assert (adjacent!()(g, 1, 2));
+	assert (!adjacent!()(g, 2, 1));
 
 	// restoring the reduced graph
 	g = restore!()(g);
-	assert(adjacent!()(g, 1, 2));
-	assert(adjacent!()(g, 2, 1));
+	assert (adjacent!()(g, 1, 2));
+	assert (adjacent!()(g, 2, 1));
 
 	// construct a graph using the given function
 	g = construct!()([1, 2, 3], [Edge!()(1, 2, 3), Edge!()(2, 3, 6), Edge!()(3, 1, 9)]);
-	assert(1 in g);
-	assert(adjacent!()(g, 1, 2));
-	assert(adjacent!()(g, 2, 1));
+	assert (1 in g);
+	assert (adjacent!()(g, 1, 2));
+	assert (adjacent!()(g, 2, 1));
 	
 	// finding safe edges for g, starting from 1
 	auto tree = construct!()([1]);
-	assert(safeEdge!()(g, tree) == Edge!()(1, 2, 3));
+	assert (safeEdge!()(g, tree) == Edge!()(1, 2, 3));
 	insertEdge!()(tree, safeEdge!()(g, tree).expand);
-	assert(safeEdge!()(g, tree) == Edge!()(2, 3, 6));
+	assert (safeEdge!()(g, tree) == Edge!()(2, 3, 6));
 	insertEdge!()(tree, safeEdge!()(g, tree).expand);
-	assert(safeEdge!()(g, tree) == Edge!().init);
+	assert (safeEdge!()(g, tree) == Edge!().init);
 
 	// performing a depth-first search
 	auto res = depthFirstSearch!()(g);
 	foreach (v; res.vertices.byValue())
 		assert (v.color == Color.BLACK);
-	assert(adjacent!(vType, EdgeType)(res.graph, 1, 2));
-	assert(adjacent!(vType, EdgeType)(res.graph, 2, 3));
-	assert(adjacent!(vType, EdgeType)(res.graph, 3, 1));
-	assert(res.graph[1][2] == EdgeType.TREE);
-	assert(res.graph[2][3] == EdgeType.TREE);
-	assert(res.graph[3][1] == EdgeType.BACKWARD);
+	assert (adjacent!(vType, EdgeType)(res.graph, 1, 2));
+	assert (adjacent!(vType, EdgeType)(res.graph, 2, 3));
+	assert (adjacent!(vType, EdgeType)(res.graph, 3, 1));
+	assert (res.graph[1][2] == EdgeType.TREE);
+	assert (res.graph[2][3] == EdgeType.TREE);
+	assert (res.graph[3][1] == EdgeType.BACKWARD);
 }
