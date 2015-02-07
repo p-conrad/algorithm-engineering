@@ -179,6 +179,75 @@ Graph!(V, E) genericMST(V = vType, E = eType)(Graph!(V, E) g) {
 	return tree;
 }
 
+/**********************************************************************
+* DEPTH-FIRST SEARCH
+**********************************************************************/
+// Color of Nodes found while searching the graph
+// WHITE: undiscovered, GREY: discovered, but not finished,
+// BLACK: discovered and finished
+enum Color { WHITE, GREY, BLACK }
+// Types of edges found. In an undirected graph, only tree and backward
+// edges can occur.
+enum EdgeType { TREE, FORWARD, BACKWARD, CROSS }
+// A tuple holding all information on discovered vertices: its
+// predecessor, the time discovered, the time finished, and its color
+alias vData(V = vType) = Tuple!(V, "parent", int, "d", int, "f",
+		Color, "color");
+// The result returned by the algorithm: A hash containing all
+// information on discovered vertices, and a graph holding information
+// about the type of discovered edges.
+alias DFSResult(V = vType) = Tuple!(vData!V[V], "vertices",
+		Graph!(V, EdgeType), "graph");
+
+// The depth-first search algorithm
+DFSResult!V depthFirstSearch(V = vType, E = vType)(in Graph!(V, E) g) {
+	// initialization - all nodes are undiscovered first, time runs from
+	// zero, every node is its own parent
+	int time = 0;
+	DFSResult!V result;
+	foreach (u; g.byKey()) {
+		result.vertices[u] = vData!V(u, 0, 0, Color.WHITE);
+	}
+
+	// Search all vertices in the graph and visit them if they have not
+	// yet been discovered
+	foreach (u; g.byKey()) {
+		if (result.vertices[u].color == Color.WHITE)
+			dfsVisit!(V, E)(g, result, u, time);
+	}
+
+	return result;
+}
+
+void dfsVisit(V = vType, E = eType)(in Graph!(V, E) g,
+		ref DFSResult!V result, V u, ref int time) {
+	time += 1;
+	result.vertices[u].d = time;
+	result.vertices[u].color = Color.GREY;
+
+	// Explore all edges to nodes (v) adjacent with u, classifying them
+	// accordingly. If v has not yet been discovered, the explored edge
+	// is a tree edge. If v has already been discovered, the explored
+	// edge is a back edge. Currently, only the edges of undirected
+	// graphs are being classified correctly.
+	foreach (v; g[u].byKey()) {
+		if (result.vertices[v].color == Color.WHITE) {
+			insertEdge!(V, EdgeType)(result.graph, u, v,
+					EdgeType.TREE);
+			result.vertices[v].parent = u;
+			dfsVisit!(V, E)(g, result, v, time);
+		}
+		else if (result.vertices[v].color == Color.GREY) {
+			if (!adjacent!(V, EdgeType)(result.graph, u, v))
+				insertEdge!(V, EdgeType)(result.graph, u, v,
+						EdgeType.BACKWARD);
+		}
+	}
+	result.vertices[u].color = Color.BLACK;
+	time += 1;
+	result.vertices[u].f = time;
+}
+
 unittest {
 	Graph!() g;
 
@@ -230,4 +299,15 @@ unittest {
 	assert(safeEdge!()(g, tree) == Edge!()(2, 3, 6));
 	insertEdge!()(tree, safeEdge!()(g, tree).expand);
 	assert(safeEdge!()(g, tree) == Edge!().init);
+
+	// performing a depth-first search
+	auto res = depthFirstSearch!()(g);
+	foreach (v; res.vertices.byValue())
+		assert (v.color == Color.BLACK);
+	assert(adjacent!(vType, EdgeType)(res.graph, 1, 2));
+	assert(adjacent!(vType, EdgeType)(res.graph, 2, 3));
+	assert(adjacent!(vType, EdgeType)(res.graph, 3, 1));
+	assert(res.graph[1][2] == EdgeType.TREE);
+	assert(res.graph[2][3] == EdgeType.TREE);
+	assert(res.graph[3][1] == EdgeType.BACKWARD);
 }
