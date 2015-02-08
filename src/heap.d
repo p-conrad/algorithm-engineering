@@ -42,7 +42,7 @@ bool isHeap(T)(T[] array, size_t i) {
 }
 
 void maxHeapify(T)(T[] array, size_t i) {
-	import std.algorithm;
+	import std.algorithm : swap;
 
 	auto l = left(i);
 	auto r = right(i);

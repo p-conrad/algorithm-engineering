@@ -1,7 +1,6 @@
 module measurement;
 
 import meter;
-import std.math;
 import std.stdio;
 
 class Measurement {
@@ -28,6 +27,7 @@ class Measurement {
 		}
 
 		double sd() {
+			import std.math : sqrt;
 			double squaredDiffSum = 0;
 
 			foreach (e; data)
@@ -102,6 +102,7 @@ class Measurement {
 
 		// round the values
 		double roundToPrecision(double value) {
+			import std.math : round;
 			int factor = 10 ^^ PRECISION;
 			return (round(value * factor) / factor);
 		}
@@ -124,7 +125,7 @@ class Measurement {
 
 		// write the header into the measurements file
 		void writeFileHeader(ref File file) {
-			import std.array;
+			import std.array : split;
 
 			if (OUTPUT_TO_CSV) {
 				if (meter.isWall())
@@ -198,7 +199,7 @@ class FibMeasurement : Measurement {
 
 	public:
 		this(Meter m) {
-			import std.conv;
+			import std.conv : to;
 			super(m);
 			super.outputs = to!(char[][])(["fibExponential", "fibLinear",
 				"fibLinear2", "fibLogarithmic", "fibClosed", "fibTable"]);
@@ -245,9 +246,6 @@ class FibMeasurement : Measurement {
 
 class SortMeasurement : Measurement {
 	import sort;
-	import std.conv;
-	import std.algorithm;
-	import std.random;
 
 	public:
 		enum Arrangement { ASC, DESC, RAND, REP }
@@ -322,6 +320,7 @@ class SortMeasurement : Measurement {
 			setNames();
 		}
 
+		import std.random : uniform;
 		void setRandom() {
 			foreach (ref e; toSort)
 				e = uniform(0, MAX_RAND);
@@ -341,7 +340,7 @@ class SortMeasurement : Measurement {
 		}
 
 	private:
-		import std.conv;
+		import std.conv : to;
 		Arrangement a;
 		int[] toSort;
 		char[][] baseNames = to!(char[][])(["insertionSort", "quickSort",
@@ -371,7 +370,6 @@ class SortMeasurement : Measurement {
 
 class MSTMeasurement : Measurement {
 	import graph;
-	import std.conv : to;
 	public:
 		this(Meter m) {
 			super(m);
@@ -402,6 +400,7 @@ class MSTMeasurement : Measurement {
 		}
 
 	private:
+		import std.conv : to;
 		Graph!() g;
 		char[][] baseNames = to!(char[][])([ "genericMST" ]);
 		uint vCount;

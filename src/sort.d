@@ -1,6 +1,6 @@
 module sort;
 
-import std.algorithm;
+import std.algorithm : swap, isSorted;
 
 // The Insertion Sort algorithm
 void insertionSort(T)(T[] array) {
@@ -31,7 +31,7 @@ unittest {
 // a random pivot, using Insertion Sort for smaller arrays, and creating
 // a 'fat partition' containing multiple pivot elements.
 void quickSort(T)(T[] array) {
-	import std.random;
+	import std.random : uniform;
 
 	if (array.length <= 1) return;
 	if (array.length <= 15) {
@@ -196,7 +196,7 @@ unittest {
 
 version(unittest)
 T[] randomArray(T)(size_t size = 1000, T maxNumber = 30000) {
-	import std.random;
+	import std.random : uniform;
 
 	auto array = new T[](size);
 	foreach(ref e; array)

@@ -1,7 +1,7 @@
 module matrix;
 
-import std.exception;
-import std.string;
+import std.exception : enforce;
+import std.string : format;
 
 class Matrix(T) {
 	public:
@@ -127,6 +127,7 @@ class Matrix(T) {
 }
 
 unittest {
+	import std.exception : assertThrown;
 	// basic operations: creating a matrix, setting its elements
 	auto mat = new Matrix!int(4, 2);
 	assert(mat.getRows() == 4);

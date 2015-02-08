@@ -8,8 +8,7 @@ import std.stdio;
 // opened.
 File openFile(in char[] fileName, in char[] folderName, bool overwrite) {
 	import std.file;
-	import std.conv;
-	import std.string;
+	import std.string : format;
 
 	if (exists(folderName) && !isDir(folderName))
 		remove(folderName);
@@ -30,6 +29,7 @@ File openFile(in char[] fileName, in char[] folderName, bool overwrite) {
 		// The last inserted element will be a non-existing file which will
 		// be used as the first 'target' below.
 		do {
+			import std.conv : to;
 			nextFile = format("%s/%s_%s", folderName, to!(char[])(count), fileName).dup;
 			existingFiles ~= nextFile;
 			count++;
