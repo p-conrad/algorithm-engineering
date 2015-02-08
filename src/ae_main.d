@@ -4,28 +4,6 @@ import meter;
 import measurement;
 import cache;
 
-void timeMeasurements(int option) {
-	if (option == 0) {
-		auto measurement = new FibMeasurement(new WallMeter());
-		measurement.doMeasurement();
-	}
-	else if (option == 1) {
-		auto measurement = new SortMeasurement(new WallMeter());
-		measurement.measureForAll();
-	}
-}
-
-void countCycles(int option) {
-	if (option == 0) {
-		auto measurement = new FibMeasurement(new CycleMeter());
-		measurement.doMeasurement();
-	}
-	else if (option == 1) {
-		auto measurement = new SortMeasurement(new CycleMeter());
-		measurement.measureForAll();
-	}
-}
-
 int getUserInput() {
 	int option;
 	writeln("***** MAIN *****");
@@ -35,7 +13,9 @@ int getUserInput() {
 	writeln("(4) Do a cycle count measurement of the sorting algorithms");
 	writeln("(5) Print information about this system's caches (Intel only)");
 	writeln("(6) Output the memory mountain of this system");
-	writeln("(7) Quit and do nothing");
+	writeln("(7) Do a wall time measurement of the spanning tree algorithms");
+	writeln("(8) Do a cycle count measurement of the spanning tree algorithms");
+	writeln("(9) Quit and do nothing");
 	write("Selection: ");
 	readf("%s", &option);
 
@@ -47,16 +27,20 @@ void main() {
 
 	switch (option) {
 		case 1:
-			timeMeasurements(0);
+			auto measurement = new FibMeasurement(new WallMeter());
+			measurement.doMeasurement();
 			break;
 		case 2:
-			countCycles(0);
+			auto measurement = new FibMeasurement(new CycleMeter());
+			measurement.doMeasurement();
 			break;
 		case 3:
-			timeMeasurements(1);
+			auto measurement = new SortMeasurement(new WallMeter());
+			measurement.measureForAll();
 			break;
 		case 4:
-			countCycles(1);
+			auto measurement = new SortMeasurement(new CycleMeter());
+			measurement.measureForAll();
 			break;
 		case 5:
 			printSystemCaches();
@@ -65,6 +49,14 @@ void main() {
 			memoryMountain();
 			break;
 		case 7:
+			auto measurement = new MSTMeasurement(new WallMeter());
+			measurement.measureAll();
+			break;
+		case 8:
+			auto measurement = new MSTMeasurement(new CycleMeter());
+			measurement.measureAll();
+			break;
+		case 9:
 		default:
 			{ }
 	}

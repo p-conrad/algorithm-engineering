@@ -341,6 +341,7 @@ class SortMeasurement : Measurement {
 		}
 
 	private:
+		import std.conv;
 		Arrangement a;
 		int[] toSort;
 		char[][] baseNames = to!(char[][])(["insertionSort", "quickSort",
@@ -366,4 +367,75 @@ class SortMeasurement : Measurement {
 		int VECTOR_SIZE = 1000;
 		int REP_COUNT = 20;
 		int MAX_RAND = 30000;
+}
+
+class MSTMeasurement : Measurement {
+	import graph;
+	import std.conv : to;
+	public:
+		this(Meter m) {
+			super(m);
+			MEASURE_UPTO = 500;
+			currentDegree = 1;
+			outputs.length = baseNames.length;
+			init();
+		}
+		// returns a single measurement where n equals the number of vertices.
+		override double singleMeasurement(int n, size_t opIndex) {
+			for (; vCount <= n; insertNew(currentDegree)) {}
+			if (opIndex == 0) {
+				meter.startMeasurement();
+				genericMST!()(g);
+				meter.stopMeasurement();
+			}
+			else return -1;
+			return meter.getResult();
+		}
+
+		// a function used to measure for all degrees at once
+		void measureAll() {
+			for (uint i = 1; i <= MAX_DEGREE; i++) {
+				currentDegree = i;
+				init();
+				doMeasurement();
+			}
+		}
+
+	private:
+		Graph!() g;
+		char[][] baseNames = to!(char[][])([ "genericMST" ]);
+		uint vCount;
+		uint eCount;
+		uint currentDegree;
+
+		uint MAX_WEIGHT = 250;
+		uint MAX_DEGREE = 6;
+
+		uint maxEdges() {
+			if (vCount == 0) return 0;
+			return (vCount * (vCount - 1) / 2);
+		}
+
+		void init() {
+			import std.string : format;
+			g = g.init;
+			vCount = 0;
+			eCount = 0;
+			outputs.length = 0;
+			foreach (e; baseNames)
+				outputs ~= e ~ format("_d%s", currentDegree).dup;
+		}
+
+		void insertNew(uint degree) {
+			import std.random : uniform;
+			vCount++;
+			insertVertex!()(g, vCount);
+			for (uint i = 1; i <= degree; i++) {
+				if (eCount == maxEdges()) break;
+				// try to insert a new edge to a randomly chosen vertex
+				while (!insertEdge!()(g, vCount, uniform(1, vCount),
+							uniform(1, MAX_WEIGHT))) {}
+				eCount ++;
+			}
+		}
 }
