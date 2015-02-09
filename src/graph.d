@@ -22,16 +22,21 @@ alias Edge(V = vType, E = eType) = Tuple!(V, "a", V, "b", E, "weight");
 
 // check whether two given vertices are connected
 bool adjacent(V = vType, E = eType)(in Graph!(V, E) g, in V a, in V b) {
-	if (!((a in g) && (b in g))) return false;
+	if (!(hasVertex!(V, E)(g, a) && hasVertex!(V, E)(g, b))) return false;
 
 	return cast(bool)(b in g[a]);
 }
 
+// check whether a given graph conains a certain node
+bool hasVertex(V = vType, E = eType)(in Graph!(V, E) g, V v) {
+	return ((v in g) !is null);
+}
+
 // insert a single vertex into a graph, not having any adjacent edges
-bool insertVertex(V = vType, E = eType)(ref Graph!(V, E) g, V n) {
-	if (n in g) return false;
+bool insertVertex(V = vType, E = eType)(ref Graph!(V, E) g, V v) {
+	if (hasVertex!(V, E)(g, v)) return false;
 	else {
-		g[n] = g[n].init;
+		g[v] = g[v].init;
 		return true;
 	}
 }
@@ -39,7 +44,7 @@ bool insertVertex(V = vType, E = eType)(ref Graph!(V, E) g, V n) {
 // insert a new edge into a graph. Existing edges will be overridden.
 bool insertEdge(V = vType, E = eType)(ref Graph!(V, E) g, V a, V b,
 		E weight = E.init, bool oneWay = false, bool insertNew = true) {
-	if ((!(a in g) || !(b in g)) && !insertNew)
+	if ((!hasVertex!(V, E)(g, a) || !hasVertex!(V, E)(g, b)) && !insertNew)
 		return false;
 	if (adjacent!(V, E)(g, a, b)) return false;
 	
@@ -58,7 +63,7 @@ bool insertEdge(V = vType, E = eType)(ref Graph!(V, E) g, V a, V b,
 // remove an edge from the graph
 bool removeEdge(V = vType, E = eType)(ref Graph!(V, E) g, V a, V b,
 		bool oneWay = false) {
-	if ((a in g) && (b in g)) {
+	if (hasVertex!(V, E)(g, a) && hasVertex!(V, E)(g, b)) {
 		g[a].remove(b);
 		if (!oneWay)
 			g[b].remove(a);
@@ -139,13 +144,13 @@ Edge!(V, E) safeEdge(V = vType, E = eType)(in Graph!(V, E) g,
 		in Graph!(V, E) sub) {
 	// sub must be an actual subset of g
 	foreach (v; sub.byKey())
-		assert (v in g);
+		assert (hasVertex!(V, E)(g, v));
 
 	Edge!(V, E)[] edges;
 
 	foreach (a; sub.byKey()) {
 		foreach (b; g[a].byKey()) {
-			if (!(b in sub))
+			if (!hasVertex!(V, E)(sub, b))
 				edges ~= Edge!(V, E)(a, b, g[a][b]);
 		}
 	}
@@ -267,7 +272,7 @@ unittest {
 	// inserting vertices
 	assert (insertVertex!()(g, 1));
 	assert (!insertVertex!()(g, 1));
-	assert (1 in g);
+	assert (hasVertex!()(g, 1));
 	insertVertex!()(g, 2);
 	insertVertex!()(g, 3);
 
@@ -301,7 +306,7 @@ unittest {
 
 	// construct a graph using the given function
 	g = construct!()([1, 2, 3], [Edge!()(1, 2, 3), Edge!()(2, 3, 6), Edge!()(3, 1, 9)]);
-	assert (1 in g);
+	assert (hasVertex!()(g, 1));
 	assert (adjacent!()(g, 1, 2));
 	assert (adjacent!()(g, 2, 1));
 	
