@@ -266,6 +266,32 @@ bool isTree(V = vType, E = eType)(in Graph!(V, E) g) {
 	return true;
 }
 
+// Kruskal's algorithm for determining a minimum spanning tree
+Graph!(V, E) kruskalMST(V = vType, E = eType)(in Graph!(V, E) g) {
+	Graph!(V, E) result;
+
+	// generate a disjoint set forest to keep track of the connected
+	// components in the graph
+	import dsf;
+	auto components = new DisjointSetForest!V(g.keys);
+
+	// generate a priority queue containing all edges of the graph in
+	// non-descending order
+	import std.container.binaryheap;
+	auto edges = heapify!("a.weight > b.weight")(toArray!(V, E)(g));
+
+	while (!edges.empty()) {
+		auto minEdge = edges.front();
+		edges.popFront();
+		if (components.findSet(minEdge.a) != components.findSet(minEdge.b)) {
+			insertEdge!(V, E)(result, minEdge.expand);
+			components.unite(minEdge.a, minEdge.b);
+		}
+	}
+
+	return result;
+}
+
 unittest {
 	Graph!() g;
 
@@ -357,5 +383,9 @@ unittest {
 			Edge!char('w', 'y', 2)]);
 	assert (!isTree!char(g2));
 	auto g2Tree = genericMST!char(g2);
+	assert (isTree!char(g2Tree));
+
+	// using Kruskal's algorithm to determine a spanning tree
+	g2Tree = kruskalMST!char(g2);
 	assert (isTree!char(g2Tree));
 }
