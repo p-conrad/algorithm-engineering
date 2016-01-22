@@ -284,8 +284,9 @@ class SortMeasurement : Measurement {
 				meter.stopMeasurement();
 			}
 			else if (opIndex == 4) {
+				import std.algorithm : sort;
 				meter.startMeasurement();
-				array.sort;
+				sort(array);
 				meter.stopMeasurement();
 			}
 			else return -1;
@@ -315,7 +316,8 @@ class SortMeasurement : Measurement {
 		void setDescending() {
 			foreach (i, ref e; toSort)
 				e = cast(int) i;
-			toSort.reverse;
+			import std.algorithm : reverse;
+			reverse(toSort);
 			a = Arrangement.DESC;
 			setNames();
 		}

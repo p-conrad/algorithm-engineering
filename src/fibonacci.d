@@ -186,7 +186,7 @@ unittest {
 }
 
 ulong fibTable(uint n) {
-	const static int fibs[] = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89,
+	const static int[] fibs = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89,
 		  144, 233, 377, 610, 987, 1697, 2584, 4181];
 
 	if (n < fibs.length) return fibs[n];
