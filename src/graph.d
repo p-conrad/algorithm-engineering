@@ -322,8 +322,8 @@ unittest {
 
 	// reducing the graph
 	g = reduce!()(g);
-	assert (adjacent!()(g, 1, 2));
-	assert (!adjacent!()(g, 2, 1));
+	assert (!adjacent!()(g, 1, 2));
+	assert (adjacent!()(g, 2, 1));
 
 	// restoring the reduced graph
 	g = restore!()(g);
