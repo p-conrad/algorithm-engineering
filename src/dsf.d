@@ -8,7 +8,7 @@ class DisjointSetForest(T) {
 		// elements, where each element belongs to its own set.
 		this(T[] elements) {
 			foreach (e; elements) {
-				parentOf[e] = n;
+				parentOf[e] = e;
 				rankOf[e] = 0;
 			}
 		}
